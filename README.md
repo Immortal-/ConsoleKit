@@ -55,10 +55,10 @@ public struct User
 
 Building the table is very easy, can be done in only 2 lines:
 ```C#
-List<User> = new List<User> { }; //assume populated
+List<User> users = new List<User> { }; //assume populated
 
 Table table = new Table(50, 2);
-table.BuildTable(_users);
+table.BuildTable(users);
 ```
 
 Constructor args:
