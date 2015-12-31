@@ -62,7 +62,6 @@ namespace EasyConsoleKit
             {
                 Name = names[0],
                 Surname = names[1],
-
                 Age = age
             };
 
