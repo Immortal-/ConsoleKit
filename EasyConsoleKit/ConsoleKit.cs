@@ -5,6 +5,61 @@ using System.Diagnostics;
 
 namespace ConsoleKit
 {
+    public class Menu
+    {
+        /// <summary>
+        ///  A list of options to choose. Indexing and numeric quantifying is handled automatically.
+        /// </summary>
+        public string[] Options;
+
+        /// <summary>
+        ///  The selected color to highlight the option with.
+        /// </summary>
+        public ConsoleColor HighlightColor;
+
+        /// <summary>Prompts for input, handles everything. Returns the corresponding choice against the Options.</summary>
+        /// <param name="selected"> Which item/position should be highlighted on print. Ignore for first.</param>
+        /// <code>int choice = menu.AwaitInput();</code>
+        public int AwaitInput(int selected = 0)
+        {
+            for (var i = 0; i < Options.Length; i++)
+            {
+                if (selected == i)
+                    Console.ForegroundColor = HighlightColor;
+
+                Console.WriteLine(string.Format("{0}.\t{1}", i + 1, Options[i]));
+                Console.ResetColor();
+            }
+
+            var input = Console.ReadKey();
+            var info = TranslateKeyInput(input.Key, selected);
+
+            Console.Clear();
+
+            if (info == -1)
+                return selected;
+            else
+                return this.AwaitInput(info);
+        }
+
+        private int TranslateKeyInput(ConsoleKey key, int selected)
+        {
+            var max = Options.Length - 1;
+
+            switch (key)
+            {
+                case ConsoleKey.UpArrow:
+                    return selected == 0 ? max : selected - 1;
+                case ConsoleKey.DownArrow:
+                    return selected == max ? 0 : selected + 1;
+                case ConsoleKey.Enter:
+                    return -1;
+                default:
+                    return selected;
+            }
+        }
+    }
+    
     public class Table
     {
         private readonly int _tableWidth;
@@ -79,61 +134,6 @@ namespace ConsoleKit
         private string Ellipsis(string text, int width)
         {
             return text.Substring(0, width - 3) + new string('.', 3);
-        }
-    }
-
-    public class Menu
-    {
-        /// <summary>
-        ///  A list of options to choose. Indexing and numeric quantifying is handled automatically.
-        /// </summary>
-        public string[] Options;
-
-        /// <summary>
-        ///  The selected color to highlight the option with.
-        /// </summary>
-        public ConsoleColor HighlightColor;
-
-        /// <summary>Prompts for input, handles everything. Returns the corresponding choice against the Options.</summary>
-        /// <param name="selected"> Which item/position should be highlighted on print. Ignore for first.</param>
-        /// <code>int choice = menu.AwaitInput();</code>
-        public int AwaitInput(int selected = 0)
-        {
-            for (var i = 0; i < Options.Length; i++)
-            {
-                if (selected == i)
-                    Console.ForegroundColor = HighlightColor;
-
-                Console.WriteLine(string.Format("{0}.\t{1}", i + 1, Options[i]));
-                Console.ResetColor();
-            }
-
-            var input = Console.ReadKey();
-            var info = TranslateKeyInput(input.Key, selected);
-
-            Console.Clear();
-
-            if (info == -1)
-                return selected;
-            else
-                return this.AwaitInput(info);
-        }
-
-        private int TranslateKeyInput(ConsoleKey key, int selected)
-        {
-            var max = Options.Length - 1;
-
-            switch (key)
-            {
-                case ConsoleKey.UpArrow:
-                    return selected == 0 ? max : selected - 1;
-                case ConsoleKey.DownArrow:
-                    return selected == max ? 0 : selected + 1;
-                case ConsoleKey.Enter:
-                    return -1;
-                default:
-                    return selected;
-            }
         }
     }
 
