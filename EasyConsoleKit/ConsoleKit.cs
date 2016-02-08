@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
 
 namespace ConsoleKit
 {
@@ -17,11 +16,19 @@ namespace ConsoleKit
         /// </summary>
         public ConsoleColor HighlightColor;
 
+        /// <summary>
+        /// A static string that will display at the top of the menu.
+        /// </summary>
+        public string Banner;
+
         /// <summary>Prompts for input, handles everything. Returns the corresponding choice against the Options.</summary>
         /// <param name="selected"> Which item/position should be highlighted on print. Ignore for first.</param>
         /// <code>int choice = menu.AwaitInput();</code>
         public int AwaitInput(int selected = 0)
         {
+            Console.WriteLine(Banner);
+            Console.WriteLine();
+
             for (var i = 0; i < Options.Length; i++)
             {
                 if (selected == i)
@@ -59,23 +66,32 @@ namespace ConsoleKit
             }
         }
     }
-    
+
     public class Table
     {
-        private readonly int _tableWidth;
+        private readonly int _width;
         private readonly int _indent;
 
-        /// <summary>Initializes the Table.</summary>
-        /// <param name="width"> Width of the table.</param>
-        /// <param name="indent"> A spacing between the console window border and the start of the grid - purely aesthetic.</param>
+        // <summary>Initializes the Table.</summary>
+        // <param name="width"> Width of the table.</param>
+        // <param name="indent"> A spacing between the console window border and the start of the grid - purely aesthetic.</param>
+
+        /// <summary>
+        /// Initializes the Table.
+        /// </summary>
+        /// <param name="width">Width of the table.</param>
+        /// <param name="indent">Spacing between the console border and the start of the grid.</param>
         public Table(int width, int indent)
         {
-            _tableWidth = width;
+            _width = width;
             _indent = indent;
         }
 
-        /// <summary>Builds a table from a list of custom types. Automatically pulls property names and all corresponding values.</summary>
-        /// <param name="items"> A collection of items to populate with. Must hold at least 1 item.</param>
+        /// <summary>
+        /// Builds a table from a list of custom types. Automatically pulls property names and all corresponding values.
+        /// </summary>
+        /// <typeparam name="T">Type</typeparam>
+        /// <param name="items">A List<typeparamref name="T"/>> to build a table from.</param>
         public void BuildTable<T>(List<T> items)
         {
             for (var i = 0; i < _indent; i++)
@@ -90,15 +106,18 @@ namespace ConsoleKit
                 PrintRow(props.Select(p => p.GetValue(items[i]).ToString()));
         }
 
-        /// <summary>Prints a header-less row for easy formatting.</summary>
-        /// <param name="items"> A collection of items to print. Must hold at least 1 item.</param>
-        /// <param name="divider"> Whether or not to include a divider below the entry.</param>
+        /// <summary>
+        /// Prints a row for formatting. 
+        /// </summary>
+        /// <typeparam name="T">Type</typeparam>
+        /// <param name="items">A collection to print from. Must hold at least 1 item.</param>
+        /// <param name="divider">Whether or not to include a divider below the entry.</param>
         public void PrintRow<T>(IEnumerable<T> items, bool divider = true)
         {
             PrintIndent();
 
             var length = items.Count();
-            var width = (_tableWidth - length) / length;
+            var width = (_width - length) / length;
 
             foreach (var column in items)
                 Console.Write(BuildCellString(column.ToString(), width) + '|');
@@ -117,7 +136,7 @@ namespace ConsoleKit
         private void PrintDivider()
         {
             PrintIndent();
-            Console.WriteLine(new string('-', (_tableWidth - 1)));
+            Console.WriteLine(new string('-', (_width - 1)));
         }
 
         private string BuildCellString(string text, int width)
@@ -139,12 +158,35 @@ namespace ConsoleKit
 
     public static class Validator
     {
-        /// <summary>Prompts and attempts to convert input from the user.</summary>
-        /// <param name="prompt"> Instructions to prompt the user. ": " is appended automatically for cleaner formatting.</param>
-        /// /// <param name="retry"> A message if conversion has failed i.e. user must retry.</param>
-        public static T GetInput<T>(string prompt, string retry)
+        /// <summary>
+        /// Prompts and validates input against a lambda expression
+        /// </summary>
+        /// <typeparam name="T">Desired type</typeparam>
+        /// <param name="prompt">Instructions for the user</param>
+        /// <param name="retry">A message to display if conversion or validation has failed</param>
+        /// <param name="comparer">Lambda expression to compare input against. Predicate variable must match target type.</param>
+        /// <returns>Appropriated type from console.</returns>
+        public static T GetInput<T>(string prompt, string retry, Func<T, bool> comparer)
         {
-            Console.Write(prompt + ": ");
+            T input;
+            var valid = false;
+
+            do
+            {
+                input = PromptForInput<T>(prompt, retry);
+                valid = comparer(input);
+
+                if (!valid)
+                    Console.WriteLine(retry);
+            } while (!valid);
+
+            return (T)Convert.ChangeType(input, typeof(T));
+        }
+
+        private static T PromptForInput<T>(string prompt, string retry)
+        {
+            Console.Write((prompt.EndsWith(" ") ? prompt : prompt + " "));
+
             var input = Console.ReadLine();
 
             try
@@ -154,29 +196,10 @@ namespace ConsoleKit
             catch
             {
                 Console.WriteLine(retry);
-                return GetInput<T>(prompt, retry);
+                Console.WriteLine();
+                
+                return PromptForInput<T>(prompt, retry);
             }
-        }
-
-        /// <summary>Prompts and validates input against a lambda expression.</summary>
-        /// <param name="prompt"> Instructions to prompt the user. ": " is appended automatically for cleaner formatting.</param>
-        /// <param name="retry"> A message if conversion has failed i.e. user must retry.</param>
-        /// <param name="comparer"> Lambda expression to compare input against. Predicate variable must match input type.</param>
-        public static T ValidateInput<T>(string prompt, string retry, Func<T, bool> comparer)
-        {
-            T input;
-            var valid = false;
-
-            do
-            {
-                input = GetInput<T>(prompt, retry);
-                valid = comparer(input);
-
-                if (!valid)
-                    Console.WriteLine(retry);
-            } while (!valid);
-
-            return (T)Convert.ChangeType(input, typeof(T));
         }
     }
 }
