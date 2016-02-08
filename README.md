@@ -23,16 +23,9 @@ Menu menu = new Menu()
 int selection = menu.AwaitInput();
 ```
 ##Validator
-Writing a bunch of while loops and constant checking can get very boring, so it's wrapped up nicely here for you. To keep things neat, a colon and space is automatically appended to your prompt. There are 2 options:
-- Get
-- Validate
+Writing a bunch of while loops and constant checking can get very boring, so it's wrapped up nicely here for you. To keep things neat, a pace is automatically appended to your prompt if it doesn't already end with one.
 
-The first simply prompts for input and attempts to convert it to the type you specified. If it can't, it allowed an error message to show and reattempts input.
-```C#
-int age = Validator.GetInput<int>("Enter your age", "Input must be a number");
-```
-
-Validation works similar but supports a lambda expression to check for validation. This could be handy for anything, such as:
+Validation supports a lambda expression to act as a validator. This could be handy for anything, such as:
 - A string is lower case, entirely alphabetical, contains < x characters, etc.
 - An int is within a certain range
 - You get the idea
