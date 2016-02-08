@@ -1,6 +1,8 @@
 # Console Kit
 A handy tool kit for making the console more user friendly with interactive menus, easy validation and tables.
 
+**Somebody botted the repo stars :(**
+
 ![Demo](http://orig08.deviantart.net/f75d/f/2015/365/5/3/2015_12_31_16_26_15_by_oduslabs-d9m6imp.gif)
 
 Cool right?
