@@ -1,7 +1,7 @@
 # Console Kit
 A handy tool kit for making the console more user friendly with interactive menus, easy validation and tables.
 
-**Somebody botted the repo stars :(**
+**Somebody botted the repo stars, this isn't genuinely trending :( **
 
 ![Demo](http://orig08.deviantart.net/f75d/f/2015/365/5/3/2015_12_31_16_26_15_by_oduslabs-d9m6imp.gif)
 
@@ -16,8 +16,10 @@ Using is very simple to set up:
 ```C#
 Menu menu = new Menu()
 {
-    Options = new string[] {"Menu item", "Another item", "One more should do it"},
-    HighlightColor = ConsoleColor.Red
+    Banner = "Easy Console Kit Demonstration",
+    HighlightColor = ConsoleColor.Red,
+    
+    Options = new string[] {"Menu item", "Another item", "One more should do it"}
 };
 
 int selection = menu.AwaitInput();
